@@ -36,7 +36,7 @@ get '/joels/channels' do
     return send_file "html/channelStats.html"
 end
 
-get '/joels/users/data' do
+get '/api/joels/users' do
     listUsers = Array.new
     way = params[:way]
     if params[:sort] == "count"
@@ -59,7 +59,7 @@ get '/joels/users/data' do
     ]
 end
 
-get '/joels/channels/data' do
+get '/api/joels/channels' do
     listChannels = Array.new
     way = params[:way]
     if params[:sort] == "count"

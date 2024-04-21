@@ -196,7 +196,7 @@
             }
             async function getUserData() {
                 
-                adress = "/joels/users/data?sort=" + sort + "&way=" + sort_way;
+                adress = "/api/joels/users?sort=" + sort + "&way=" + sort_way;
                 const users = await fetch(adress, { method: 'GET' }).then(response => response.json());
                 const table = document.getElementById('table-user');
                 table.innerHTML = '<tr><th onclick="sortName()" id="name">User</th><th onclick="sortDate()" id="date">Since</th><th onclick="sortCount()" id="count">Count</th></tr>';

@@ -195,7 +195,7 @@
                 }
             }
             async function getUserData() {
-                adress = "/joels/channels/data?sort=" + sort + "&way=" + sort_way;
+                adress = "/api/joels/channels?sort=" + sort + "&way=" + sort_way;
                 const users = await fetch(adress, { method: 'GET' }).then(response => response.json());
                 const table = document.getElementById('table-channel');
                 table.innerHTML = '<tr><th onclick="sortName()" id="name">Channel</th><th onclick="sortDate()" id="date">Since</th><th onclick="sortCount()" id="count">Count</th></tr>';
