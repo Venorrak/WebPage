@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venorrak - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        nav div {
+            display: inline-block;
+        }
+
+        .dropdown .dropbtn {
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        nav a:hover,
+        button:hover {
+            background-color: #666;
+            color: #fff;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            /* Set position to absolute */
+            background-color: #f1f1f1;
+            min-width: 120px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            margin: 0px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #666;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            width: 30%;
+            /* Adjust width as needed */
+            margin: 0 auto;
+            /* Center the container horizontally */
+            margin-top: 100px;
+            /* Adjust top margin for vertical centering */
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            /* Add shadow effect */
+            padding: 20px;
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            text-align: center;
+            width: 100%;
+
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form input[type="text"],
+        form input[type="password"] {
+            width: calc(100% - 40px);
+            /* Adjust width as needed */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        .success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .failed {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Venorrak</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/portfolio">Portfolio</a>
+            <div class="dropdown">
+                <a class="dropbtn">Joel stats</a>
+                <div class="dropdown-content">
+                    <a href="/joels/users">Users</a>
+                    <a href="/joels/channels">channels</a>
+                </div>
+            </div>
+            <a href="#">Login</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Login</h2>
+        <form id="login-form" action="/login" method="get">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        
+    </div>
+    <div id="alert-container"></div>
+    <div>
+        <form action="/logout" method="get">
+            <input type="submit" id="logoutButton" value="logout" style="width: 30%; margin: 30px;"></input>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            let headers = new Headers();
+            headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+            isLoggedIn = null;
+            fetch('/login', {
+                method: 'GET',
+                headers: headers,
+                credentials: 'include'
+            })
+            .then(function(response) {
+                var statusCode = response.status;
+                console.log('Response:', response);
+                console.log('HTTP Status Code:', statusCode);
+                
+                if (parseInt(statusCode) == 200) {
+                    isLoggedIn = true;
+                } else {
+                    isLoggedIn = false;
+                }
+                if (isLoggedIn === true) {
+                    var alertContainer = document.getElementById('alert-container');
+                    alertContainer.innerHTML = '<div class="alert success">Login successful!</div>';
+
+                    // Clear alert after 3 seconds
+                    setTimeout(function () {
+                        alertContainer.innerHTML = '';
+                        //window.location.href = '/';
+                    }, 3000);
+                }
+                else {
+                    var alertContainer = document.getElementById('alert-container');
+                    alertContainer.innerHTML = '<div class="alert failed">Login failed!</div>';
+
+                    // Clear alert after 3 seconds
+                    setTimeout(function () {
+                        alertContainer.innerHTML = '';
+                    }, 3000);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                isLoggedIn = false;
+            });
+            
+        });
+    </script>
+</body>
+
+</html>
