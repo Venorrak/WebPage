@@ -201,7 +201,7 @@
                 table.innerHTML = '<tr><th onclick="sortName()" id="name">Channel</th><th onclick="sortDate()" id="date">Since</th><th onclick="sortCount()" id="count">Count</th></tr>';
                 for( const u of users){
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><a href="https://www.twitch.tv/${DOMPurify.sanitize(u.name)}" target="blank">${DOMPurify.sanitize(u.name)}</a></td><td>${u.date}</td><td>${u.count}</td>`;
+                    tr.innerHTML = `<td><a href="/joels/channels?name=${DOMPurify.sanitize(u.name)}" target="blank">${DOMPurify.sanitize(u.name)}</a></td><td>${u.date}</td><td>${u.count}</td>`;
                     table.appendChild(tr);
                 }
                 color();
