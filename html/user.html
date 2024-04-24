@@ -17,7 +17,7 @@
         header {
             background-color: #333;
             color: #fff;
-            padding: 20px 0;
+            padding: 10px 0;
             text-align: center;
         }
 
@@ -83,7 +83,7 @@
         .container {
             width: 40%;
             margin: 0 auto;
-            margin-top: 100px;
+            margin-top: 50px;
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -115,6 +115,14 @@
             margin-top: 5px;
             margin: 5px 0;
         }
+
+        #pfp {
+            scale: 0.5;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -135,6 +143,9 @@
     </header>
     <div>
         <div class="container">
+            <div style="width: auto; height: 10%;">
+                <img src="" alt="profile picture" id="pfp">
+            </div>
             <div>
                 <h2 id="name-title"></h2>
             </div>
@@ -173,6 +184,7 @@
                 count = response.count;
                 rarity = response.rarity;
                 pfp = response.pfp;
+                bgp = response.bgp;
             })
             .then(function(){
                 document.getElementById('name-title').innerHTML = `
@@ -191,8 +203,10 @@
                     https://www.twitch.tv/${name}
                 `;
                 const back = document.getElementById('not-banner')
+                const picture = document.getElementById('pfp')
+                picture.src = pfp;
                 back.style.backgroundImage = `
-                    url(${pfp})
+                    url(${bgp})
                 `;
                 back.style.backgroundRepeat = 'no-repeat';
                 back.style.backgroundSize = 'cover';

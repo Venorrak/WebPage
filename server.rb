@@ -180,7 +180,9 @@ get '/api/joels/channels' do
 end
 
 get '/api/joels/users/:name' do
-    user = client.query("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = '#{params[:name]}';").first
+    user = client.query("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp_id, users.bgp_id, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = '#{params[:name]}';").first
+    pfp = client.query("SELECT url FROM pictures WHERE id = #{user["pfp_id"]};").first["url"]
+    bgp = client.query("SELECT url FROM pictures WHERE id = #{user["bgp_id"]};").first["url"]
     if user == nil
         return [
             404,
@@ -192,7 +194,8 @@ get '/api/joels/users/:name' do
             "name": user["name"],
             "date": user["date"],
             "count": user["count"],
-            "pfp": user["pfp"],
+            "pfp": pfp,
+            "bgp": bgp,
             "twitch_id": user["twitch_id"],
             "rarity": getUserRarity(user["name"], client)
         }
