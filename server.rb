@@ -180,9 +180,8 @@ get '/api/joels/channels' do
 end
 
 get '/api/joels/users/:name' do
-    user = client.query("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp_id, users.bgp_id, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = '#{params[:name]}';").first
-    pfp = client.query("SELECT url FROM pictures WHERE id = #{user["pfp_id"]};").first["url"]
-    bgp = client.query("SELECT url FROM pictures WHERE id = #{user["bgp_id"]};").first["url"]
+    user = client.query("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp_id, users.bgp_id, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = '#{params[:name]}';").first rescue nil
+    
     if user == nil
         return [
             404,
@@ -190,6 +189,8 @@ get '/api/joels/users/:name' do
             {error: "user not found"}.to_json
         ]
     else
+        pfp = client.query("SELECT url FROM pictures WHERE id = #{user["pfp_id"]};").first["url"]
+        bgp = client.query("SELECT url FROM pictures WHERE id = #{user["bgp_id"]};").first["url"]
         data = {
             "name": user["name"],
             "date": user["date"],
