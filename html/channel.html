@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venorrak - Channel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        nav div {
+            display: inline-block;
+        }
+
+        .dropdown .dropbtn {
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        nav a:hover,
+        button:hover {
+            background-color: #666;
+            color: #fff;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            /* Set position to absolute */
+            background-color: #f1f1f1;
+            min-width: 120px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: block;
+            margin: 0px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #666;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            width: 40%;
+            margin: 0 auto;
+            margin-top: 50px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center children horizontally */
+        }
+
+        .container > div {
+            width: 100%; /* Set width to 100% for full width */
+            justify-content: space-between; /* Space out elements */
+            align-items: center; /* Center elements vertically */
+        }
+
+        .container > div > p, h2 {
+            width: 100%; /* Set width to 100% for full width */
+            text-align: center; /* Center text */
+        }
+
+        .container > div > a {
+            width: 40px; /* Set width to 100% for full width */
+        }
+
+        .twitch-icon {
+            width: 100%;
+            height: auto;
+            margin-right: 5px;
+            margin-top: 5px;
+            margin: 5px 0;
+        }
+        #pfp {
+            scale: 0.5;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body id="not-banner">
+    <header>
+        <h1>Venorrak</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/portfolio">Portfolio</a>
+            <div class="dropdown">
+                <a class="dropbtn">Joel stats</a>
+                <div class="dropdown-content">
+                    <a href="/joels/users">Users</a>
+                    <a href="/joels/channels">channels</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div>
+        <div class="container">
+            <div style="width: auto; height: 10%;">
+                <img src="" alt="profile picture" id="pfp">
+            </div>
+            <div>
+                <h2 id="name-title"></h2>
+            </div>
+            <div>
+                <p>Joined: <span id="date"></span></p>
+            </div>
+            <div>
+                <p>Joel count: <span id="count"></span></p>
+            </div>
+            <div>
+                <p>Channel is in the top <span id="rarity"></span>% of channels</p>
+            </div>
+            <div>
+                <a href="" style="float: right;" class="twitch-icon" target="_blank" id="twitch-link"><img src="https://static-00.iconduck.com/assets.00/twitch-icon-490x512-4oz1jp1k.png" alt="twitch" class="twitch-icon"></a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fillChannelInfo();
+        });
+
+        function fillChannelInfo(){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const SearchedName = urlParams.get('name');
+            fetch(`/api/joels/channels/${SearchedName}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(function(response){
+                name = response.name;
+                date = response.date;
+                count = response.count;
+                rarity = response.rarity;
+            })
+            .then(function(){
+                document.getElementById('name-title').innerHTML = `
+                    ${name}
+                `;
+                document.getElementById('date').innerText = `
+                    ${date}
+                `;
+                document.getElementById('count').innerText = `
+                    ${count}
+                `;
+                document.getElementById('rarity').innerText = `
+                    ${rarity}
+                `;
+                document.getElementById('twitch-link').href = `
+                    https://www.twitch.tv/${name}
+                `;
+                
+            })
+            .then(function(){
+                fetch(`/api/joels/users/${SearchedName}`, {
+                    method: 'GET'
+                })
+                .then(response => response.json())
+                .then(function(response){
+                    pfp = response.pfp;
+                    bgp = response.bgp;
+                    const back = document.getElementById('not-banner')
+                    const picture = document.getElementById('pfp')
+                    picture.src = pfp;
+                    back.style.backgroundImage = `
+                        url(${bgp})
+                    `;
+                    back.style.backgroundRepeat = 'no-repeat';
+                    back.style.backgroundSize = 'cover';
+                    back.style.backgroundAttachment = 'fixed';
+                })
+            })
+            
+        }
+    </script>
+</body>
+
+</html>
