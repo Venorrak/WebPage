@@ -64,8 +64,10 @@ end
 
 def rebootSQLconnection()
     client = nil
+    sleep(1)
     client = Mysql2::Client.new(:host => "localhost", :username => "bot", :password => "joel")
     client.query("USE joelScan;")
+    p "rebooting SQL connection"
 end
 
 #-----------------------------------------------------------------------#
@@ -276,3 +278,10 @@ end
 #-----------------------------------------------------------------------#
 #--------------------------------OTHER----------------------------------#
 #-----------------------------------------------------------------------#
+
+Thread.start do
+    loop do
+        sleep(60)
+        client.query("SELECT 1")
+    end
+end
