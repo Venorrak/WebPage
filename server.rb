@@ -1,5 +1,6 @@
 require "bundler/inline"
 require "openssl"
+require 'absolute_time'
 
 gemfile do
     source "http://rubygems.org"
@@ -8,28 +9,49 @@ gemfile do
     gem "rackup"
     gem "webrick"
     gem "mysql2"
+    gem "faraday"
 end
 
 require "json"
 require 'sinatra'
 require "mysql2"
+require "faraday"
+require 'securerandom'
 require_relative "auth.rb"
+require_relative "env.rb"
 
 set :port, 4567
 set :bind, '0.0.0.0'
+enable :sessions
 
 client = Mysql2::Client.new(:host => "localhost", :username => "bot", :password => "joel")
 client.query("USE joelScan;")
+
+#connect to my ntfy server
+NTFYDerver = Faraday.new(url: "https://ntfy.venorrak.dev") do |conn|
+    conn.request :url_encoded
+end
 
 #-----------------------------------------------------------------------#
 #------------------------------FUNCTIONS--------------------------------#
 #-----------------------------------------------------------------------#
 
+def sendNotif(message, title)
+    subject = "290ba96bcabd3d74552ca9d39482cc3a"
+    rep = NTFYDerver.post("/#{subject}") do |req|
+        req.headers["host"] = "ntfy.venorrak.dev"
+        req.headers["Priority"] = "5"
+        req.headers["Title"] = title
+        req.body = message.to_json
+    end
+    p rep.body
+end
+
 def guard!
     auth_required = [
       401,
       {
-        "WWW-Authenticate" => "Basic"
+        "Content-Type" => "application/json",
       },
       "Invalid credentials".to_json
     ]
@@ -41,11 +63,13 @@ end
 def authorized?
     auth ||=  Rack::Auth::Basic::Request.new(request.env) 
     # request.env est disponible car on est dans le block HELPERS
-    return unless auth.provided? && auth.basic? && auth.credentials
-  
-    username, password = auth.credentials
-    $loginInfo = authenticate(username, password)
-    p $loginInfo
+    p "session : #{session[:username]}"
+    p "verified : #{session[:verified]}"
+    if session[:username].nil?
+        return unless auth.provided? && auth.basic? && auth.credentials
+        username, password = auth.credentials
+        $loginInfo = authenticate(username, password)
+    end
 end
 
 def getUserRarity(name, client)
@@ -103,11 +127,113 @@ get '/manage' do
     return send_file "html/manage.html"
 end
 
+get '/login' do
+    return send_file "html/login.html"
+end
+
 #-----------------------------------------------------------------------#
 #------------------------------ACTIONS ROUTES---------------------------#
 #-----------------------------------------------------------------------#
 
+get '/login/status' do
+    if !session[:username].nil?
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            {status: "connected"}.to_json
+        ]
+    else
+        return [
+            401,
+            { "Content-Type" => "application/json" },
+            {status: "not connected"}.to_json
+        ]
+    end
+end
 
+post '/login' do
+    guard!
+    if !session
+        return [
+            401,
+            { "Content-Type" => "application/json" },
+            "bad credentials"
+        ]
+    else
+        p "login info : #{$loginInfo}"
+        session[:username] = $loginInfo[:username]
+        p "session : #{session[:username]}"
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            "connected"
+        ]
+    end
+end
+
+get '/logout' do
+    session.clear
+    return [
+      200,
+      { "Content-Type" => "application/json" },
+      {status: "logged out"}.to_json
+    ]
+end
+
+post '/login/sendCode' do
+    code = SecureRandom.alphanumeric(6).upcase
+    session[:code] = code
+    p session[:code]
+    sendNotif("Your code is : #{code}", "2FA code")
+    sleep(60)
+    p "code expired verif : #{session[:verified]}"
+    unless session[:verified] == true
+        session.clear
+        p "session cleared"
+        return [
+            401,
+            { "Content-Type" => "application/json" },
+            {status: "not connected"}.to_json
+        ]
+    end
+    return [
+        200,
+        { "Content-Type" => "application/json" },
+        {status: "connected"}.to_json
+    ]
+end
+
+post '/login/verify' do
+    data = JSON.parse(request.body.read)
+    p data
+    p session[:code]
+    if data["code"].upcase == session[:code]
+
+        session[:verified] = true
+        p "verified"
+        p session[:verified]
+        p session[:username]
+        p session[:code]
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            {status: "connected"}.to_json
+        ]
+    else
+        p "wrong 2fa"
+        session.clear
+        return [
+            401,
+            { "Content-Type" => "application/json" },
+            {status: "not connected"}.to_json
+        ]
+    end
+end
+
+get '/pictures/:filename' do
+    p params[:filename]
+    send_file "#{__dir__}/pictures/#{params[:filename]}"
+end
 
 #-----------------------------------------------------------------------#
 #--------------------------------- API ---------------------------------#

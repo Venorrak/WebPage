@@ -179,66 +179,79 @@
             <input type="text" id="username" name="username"><br>
             <label for="password">Password:</label><br>
             <input type="password" id="password" name="password"><br><br>
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit" onclick="sendCredentials()">
         </form>
         
     </div>
     <div id="alert-container"></div>
-    <div>
-        <form action="/logout" method="get">
-            <input type="submit" id="logoutButton" value="logout" style="width: 30%; margin: 30px;"></input>
-        </form>
-    </div>
     
     <script>
-        document.getElementById('login-form').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the form from submitting normally
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-            let headers = new Headers();
-            headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
-            isLoggedIn = null;
-            fetch('/login', {
-                method: 'GET',
-                headers: headers,
-                credentials: 'include'
+        function sendNotif() {
+            var data = document.getElementById("username").value
+            console.log(data);
+            console.log(JSON.stringify({username: data}));
+            fetch('/login/sendCode', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({username: data})
             })
-            .then(function(response) {
-                var statusCode = response.status;
-                console.log('Response:', response);
-                console.log('HTTP Status Code:', statusCode);
-                
-                if (parseInt(statusCode) == 200) {
-                    isLoggedIn = true;
-                } else {
-                    isLoggedIn = false;
-                }
-                if (isLoggedIn === true) {
-                    var alertContainer = document.getElementById('alert-container');
-                    alertContainer.innerHTML = '<div class="alert success">Login successful!</div>';
+        }
 
-                    // Clear alert after 3 seconds
-                    setTimeout(function () {
-                        alertContainer.innerHTML = '';
-                        //window.location.href = '/';
-                    }, 3000);
-                }
-                else {
-                    var alertContainer = document.getElementById('alert-container');
-                    alertContainer.innerHTML = '<div class="alert failed">Login failed!</div>';
+        function sendCredentials() {
+            event.preventDefault();
+            var alertContainer = document.getElementById('alert-container');
+            let username = document.querySelector('input[name="username"]');
+            let passwordField = document.querySelector('input[name="password"]');
 
-                    // Clear alert after 3 seconds
-                    setTimeout(function () {
-                        alertContainer.innerHTML = '';
-                    }, 3000);
-                }
-            })
-            .catch(function(error) {
-                console.error('Error:', error);
-                isLoggedIn = false;
-            });
+            if (!username.value || !passwordField.value) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
             
-        });
+            fetch(`/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Basic " + btoa(`${username.value}:${passwordField.value}`),
+                }
+            }).then((response) => {
+                console.log(response.status);
+                if (response.ok) {
+                    sendNotif();
+                    let test = prompt("Please enter your 2FA", "");
+                    fetch(`/login/verify`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"},
+                        body: JSON.stringify({code: test})
+                    }).then((response) => {
+                        if (response.ok) {
+                            alertContainer.innerHTML = '<div class="alert success">Login done!</div>';
+                            setTimeout(function () {
+                                window.location.replace("/");
+                            }, 3000);
+                        } else {
+                            alertContainer.innerHTML = '<div class="alert failed">Login failed!</div>';
+                            setTimeout(function () {
+                                alertContainer.innerHTML = '';
+                            }, 3000);
+                            passwordField.value = ""; // Clear the password field
+                        }
+                    });
+                } else if (response.status === 429) {
+                    // Too many requests, refresh the page
+                    window.location.reload();
+                } else {
+                    alertContainer.innerHTML = '<div class="alert failed">Login failed!</div>';
+                    setTimeout(function () {
+                        alertContainer.innerHTML = '';
+                    }, 3000);
+                    passwordField.value = ""; // Clear the password field
+                }
+            });
+        }
     </script>
 </body>
 
