@@ -86,6 +86,19 @@ def getChannelRarity(name, client)
     return ((nbOfChannelsUnder.to_f / nbOfChannels.to_f) * 100).round(4)
 end
 
+def getChannelHistory(name, client, limit)
+    history = []
+    channel_id = client.query("SELECT id FROM channels WHERE name = '#{name}'").first["id"]
+    client.query("SELECT streamDate, count FROM streamJoels WHERE channel_id = #{channel_id} ORDER BY streamDate ASC LIMIT #{limit}").each do |row|
+        data = {
+            "date": row["streamDate"],
+            "count": row["count"]
+        }
+        history << data
+    end
+    return history
+end
+
 def rebootSQLconnection()
     client = nil
     sleep(1)
@@ -383,7 +396,8 @@ get '/api/joels/channels/:name' do
                 "name": channel["name"],
                 "date": channel["date"],
                 "count": channel["count"],
-                "rarity": getChannelRarity(channel["name"], client)
+                "rarity": getChannelRarity(channel["name"], client),
+                "history": getChannelHistory(channel["name"], client, 10)
             }
             return [
                 200,
@@ -393,6 +407,38 @@ get '/api/joels/channels/:name' do
         end
     rescue
         rebootSQLconnection()
+        return [
+            500,
+            { "Content-Type" => "application/json" },
+            {error: "internal server error"}.to_json
+        ]
+    end
+end
+
+get '/api/joels/channels/history/:name' do
+    limit = params[:limit] || 10
+    channel_name = nil
+    channel_id = nil
+    begin
+        client.query("SELECT name, id FROM channels WHERE name = '#{params[:name]}' LIMIT 1").each do |row|
+            channel_name = row["name"]
+            channel_id = row["id"]
+        end
+        if channel_name == nil
+            return [
+                404,
+                { "Content-Type" => "application/json" },
+                {error: "channel not found"}.to_json
+            ]
+        else
+            history = getChannelHistory(channel_name, client, limit)
+            return [
+                200,
+                { "Content-Type" => "application/json" },
+                history.to_json
+            ]
+        end
+    rescue
         return [
             500,
             { "Content-Type" => "application/json" },

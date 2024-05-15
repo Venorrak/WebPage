@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 
 <head>
     <meta charset="UTF-8">
@@ -84,6 +85,7 @@
             width: 40%;
             margin: 0 auto;
             margin-top: 50px;
+            margin-bottom: 50px;
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -121,6 +123,13 @@
             margin: 0 auto;
             display: flex;
             justify-content: center;
+        }
+        #chart {
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center children horizontally */
+            max-width: 100%; /* Set width to 100% for full width */
+            height: auto; /* Set height to auto for automatic height */
         }
     </style>
 </head>
@@ -161,11 +170,15 @@
             <div>
                 <a href="" style="float: right;" class="twitch-icon" target="_blank" id="twitch-link"><img src="/pictures/twitch.png" alt="twitch" class="twitch-icon"></a>
             </div>
+            <div id="chart" style="max-width: 100%; height: auto;"></div>
         </div>
     </div>
     
     <script>
+        
         document.addEventListener('DOMContentLoaded', function() {
+            google.charts.load('current',{packages:['corechart']});
+            //google.charts.setOnLoadCallback(drawChart);
             fillChannelInfo();
         });
 
@@ -182,6 +195,7 @@
                 date = response.date;
                 count = response.count;
                 rarity = response.rarity;
+                his = response.history;
             })
             .then(function(){
                 document.getElementById('name-title').innerHTML = `
@@ -199,7 +213,7 @@
                 document.getElementById('twitch-link').href = `
                     https://www.twitch.tv/${name}
                 `;
-                
+                drawChart(his);
             })
             .then(function(){
                 fetch(`/api/joels/users/${SearchedName}`, {
@@ -221,6 +235,21 @@
                 })
             })
             
+        }
+        function drawChart(history){
+            donne = [['Date', 'Joels']];
+            for (let i = 0; i < history.length; i++){
+                donne.push([history[i].date, history[i].count]);
+            }
+            var data = google.visualization.arrayToDataTable(donne);
+            var options = {
+                title: 'Joels over time',
+                hAxis: {title: 'Date'},
+                vAxis: {title: 'Joels'},
+                legend: 'none'
+            };
+            var chart = new google.visualization.LineChart(document.getElementById('chart'));
+            chart.draw(data, options);
         }
     </script>
 </body>
