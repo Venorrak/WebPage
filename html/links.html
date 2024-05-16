@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venorrak - User Stats</title>
+    <title>Venorrak - Link Shortener</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
     <style>
         body {
@@ -120,16 +120,64 @@
             height: auto;
             margin-right: 5px;
         }
+        form {
+            text-align: center;
+            width: 100%;
+
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form input[type="url"] {
+            width: calc(100% - 40px);
+            /* Adjust width as needed */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 50%;
+            margin: 20px auto;
+        }
+
+        .success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .failed {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-    <script>
-        var sort_way = "DESC"
-        var sort = "count"
-    </script>
     <header>
-        <h1>User Stats</h1>
+        <h1>Link Shortener</h1>
         <nav>
             <a href="/">Home</a>
             <a href="/portfolio">Portfolio</a>
@@ -140,78 +188,63 @@
                     <a href="/joels/channels">channels</a>
                 </div>
             </div>
-            <a href="/link">Short Link</a>
+            <a href="#">Short Link</a>
             <a href="/login">Login</a>
         </nav>
     </header>
-
+    <div class="container" style="width: 50%;text-align: center;">
+        <h2>Add link</h2>
+        <div id="alert-container"></div>
+        <form action="/link" id="link-form" method="post">
+            <label for="url">Url : </label><br>
+            <input type="url" id="url" name="url" required><br><br>
+            <input type="submit" value="Submit" onclick="sendLink()">
+        </form>
+    </div>
     <div class="container" style="width: 70%;">
-        <img onclick="sortWay()" src="/pictures/sort.png" alt="sort" class="toolIcon">
         <img onclick="refresh()" src="/pictures/refresh.png" alt="refresh" class="toolIcon">
         <table class="userList" id="table-user">
         </table>
-        <script>
-            function sortName(){
-                sort = "name";
-                getUserData();
-            }
-            function sortDate(){
-                sort = "creationDate";
-                getUserData();
-            }
-            function sortCount(){
-                sort = "count";
-                getUserData();
-            }
-            function sortWay(){
-                if(sort_way == "ASC"){
-                    sort_way = "DESC";
-                }else{
-                    sort_way = "ASC";
-                }
-                getUserData();
-            }
-            function refresh(){
-                getUserData();
-            }
-            function color(){
-                const name = document.getElementById('name');
-                const date = document.getElementById('date');
-                const count = document.getElementById('count');
-                switch(sort){
-                    case "name":
-                        name.style.backgroundColor = "#666";
-                        date.style.backgroundColor = "#333";
-                        count.style.backgroundColor = "#333";
-                        break;
-                    case "creationDate":
-                        name.style.backgroundColor = "#333";
-                        date.style.backgroundColor = "#666";
-                        count.style.backgroundColor = "#333";
-                        break;
-                    case "count":
-                        name.style.backgroundColor = "#333";
-                        date.style.backgroundColor = "#333";
-                        count.style.backgroundColor = "#666";
-                        break;
-                }
-            }
-            async function getUserData() {
-                
-                adress = "/api/joels/users?sort=" + sort + "&way=" + sort_way;
-                const users = await fetch(adress, { method: 'GET' }).then(response => response.json());
-                const table = document.getElementById('table-user');
-                table.innerHTML = '<tr><th onclick="sortName()" id="name">User</th><th onclick="sortDate()" id="date">Since</th><th onclick="sortCount()" id="count">Count</th></tr>';
-                for( const u of users){
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><a href="/joels/users?name=${DOMPurify.sanitize(u.name)}">${DOMPurify.sanitize(u.name)}</a></td><td>${u.date}</td><td>${u.count}</td>`;
-                    table.appendChild(tr);
-                }
-                color();
-            }
-            getUserData();
-        </script>
     </div>
+    <script>
+        function refresh(){
+            getUserData();
+        }
+        async function getUserData() {
+            
+            adress = "/api/link";
+            const links = await fetch(adress, { method: 'GET' }).then(response => response.json());
+            const table = document.getElementById('table-user');
+            table.innerHTML = '<tr><th id="code">Code</th><th id="url">Url</th></tr>';
+            for( const l of links){
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${DOMPurify.sanitize(l.hash)}</td><td><a href="${DOMPurify.sanitize(l.url)}">${DOMPurify.sanitize(l.url)}</a></td>`;
+                table.appendChild(tr);
+            }
+        }
+        function sendLink(){
+            event.preventDefault();
+            const url = document.getElementById('url').value;
+            const alertContainer = document.getElementById('alert-container');
+            console.log(url);
+            fetch('/link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({url: url}),
+            }).then(response => response.json()).then(data => {
+                if (data.error == null){
+                    alertContainer.innerHTML = `<div class="alert success">Success</div>`;
+                    url.value = "";
+                }else{
+                    alertContainer.innerHTML = `<div class="alert failed">${data.error}</div>`;
+                }
+                getUserData();
+            })
+        }
+        getUserData();
+    </script>
 </body>
 
 </html>

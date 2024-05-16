@@ -147,6 +147,7 @@
                     <a href="/joels/channels">channels</a>
                 </div>
             </div>
+            <a href="/link">Short Link</a>
             <a href="/login">Login</a>
         </nav>
     </header>
@@ -178,7 +179,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             google.charts.load('current',{packages:['corechart']});
-            //google.charts.setOnLoadCallback(drawChart);
+            google.charts.setOnLoadCallback(fillChannelInfo);
             fillChannelInfo();
         });
 

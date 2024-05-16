@@ -1,6 +1,7 @@
 require "bundler/inline"
 require "openssl"
 require 'absolute_time'
+require "net/http"
 
 gemfile do
     source "http://rubygems.org"
@@ -144,6 +145,10 @@ get '/login' do
     return send_file "html/login.html"
 end
 
+get '/link' do
+    return send_file "html/links.html"
+end
+
 #-----------------------------------------------------------------------#
 #------------------------------ACTIONS ROUTES---------------------------#
 #-----------------------------------------------------------------------#
@@ -246,6 +251,79 @@ end
 get '/pictures/:filename' do
     p params[:filename]
     send_file "#{__dir__}/pictures/#{params[:filename]}"
+end
+
+get '/link/:name' do
+    alpha = params[:name]
+    file = File.open("link.json")
+    file_data = JSON.parse(file.read)
+    exists = false
+    redirectUrl = nil
+    file_data.each do |data|
+        if data["hash"] == alpha
+            redirectUrl = data["url"]
+            exists = true
+        end
+    end
+    if exists
+        return[
+            307,
+            { "Location" => redirectUrl},
+            ""
+        ]
+    else
+        return [
+            404,
+            { "Content-Type" => "application/json" },
+            {error: "link not found"}.to_json
+        ]
+    end
+end
+
+post '/link' do
+    req = JSON.parse(request.body.read)
+    client_ip = request.ip
+    url = req["url"] rescue nil
+    p "url: #{url}"
+    alpha = Random.alphanumeric(6)
+    file = File.open("link.json")
+    file_data = JSON.parse(file.read)
+    uri = URI(url)
+    res = Net::HTTP.get_response(uri) rescue nil
+    if (res.nil?)
+        return [
+            400,
+            { "Content-Type" => "application/json" },
+            {error: "bad url"}.to_json
+        ]
+    end
+    # count the amount of links with the same client_ip
+    numLinks = file_data.map { |link| client_ip == link["client_ip"] ? 1 : 0 }.sum
+    p numLinks
+    if numLinks >= 10
+        return [
+            400,
+            { "Content-Type" => "application/json" },
+            {error: "too many links"}.to_json
+        ]
+    end
+    hash = {
+        "hash": alpha,
+        "url": url,
+        "client_ip": client_ip
+    }
+    file_data.push(hash)
+    File.open("link.json", "w") do |f|
+        f.write(file_data.to_json)
+    end
+    return [
+        201,
+        { "Content-Type" => "application/json" },
+        {
+            hash: alpha,
+            url: url
+        }.to_json
+    ]
 end
 
 #-----------------------------------------------------------------------#
@@ -447,6 +525,22 @@ get '/api/joels/channels/history/:name' do
     end
 end
 
+get '/api/link' do
+    file = File.open("link.json")
+    file_data = JSON.parse(file.read)
+    returnLinks = Array.new
+    file_data.each do |link|
+        returnLinks.push({
+            "hash": link["hash"],
+            "url": link["url"]
+        })
+    end
+    return [
+        200,
+        { "Content-Type" => "application/json" },
+        returnLinks.to_json
+    ]
+end
 #-----------------------------------------------------------------------#
 #--------------------------------OTHER----------------------------------#
 #-----------------------------------------------------------------------#
