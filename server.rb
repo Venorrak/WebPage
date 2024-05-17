@@ -2,6 +2,7 @@ require "bundler/inline"
 require "openssl"
 require 'absolute_time'
 require "net/http"
+require "rqrcode"
 
 gemfile do
     source "http://rubygems.org"
@@ -106,6 +107,23 @@ def rebootSQLconnection()
     client = Mysql2::Client.new(:host => "localhost", :username => "bot", :password => "joel")
     client.query("USE joelScan;")
     p "rebooting SQL connection"
+end
+
+def getQRCode(data)
+    qr = RQRCode::QRCode.new(data)
+    png = qr.as_png(
+        bit_depth: 1,
+        border_modules: 4,
+        color_mode: ChunkyPNG::COLOR_GRAYSCALE,
+        color: 'black',
+        file: nil,
+        fill: 'white',
+        module_px_size: 6,
+        resize_exactly_to: false,
+        resize_gte_to: false,
+        size: 400
+    )
+    return png
 end
 
 #-----------------------------------------------------------------------#
@@ -324,6 +342,36 @@ post '/link' do
             url: url
         }.to_json
     ]
+end
+
+get '/link/qr/:name' do
+    alpha = params[:name]
+    file = File.open("link.json")
+    file_data = JSON.parse(file.read)
+    exists = false
+    redirectUrl = nil
+    qr = nil
+    file_data.each do |data|
+        if data["hash"] == alpha
+            redirectUrl = data["url"]
+            exists = true
+        end
+    end
+    if exists
+        qr = getQRCode(redirectUrl)
+        IO.binwrite("qrcode.png", qr.to_s)
+        return [
+            200,
+            send_file("qrcode.png")
+        ]
+    else
+        return [
+            404,
+            { "Content-Type" => "application/json" },
+            {error: "link not found"}.to_json
+        ]
+    end
+
 end
 
 #-----------------------------------------------------------------------#
