@@ -117,3 +117,54 @@ https://server.venorrak.dev/api/joels/channels/venorrak
 ```
 
 <hr>
+
+### Get channel history :
+Get number of Joel for each stream of the selected streamer
+
+URL : https://server.venorrak.dev/api/joels/channels/history/twitchname
+
+#### Input (url)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| name | String | Yes | name of a registered channel
+
+#### Input (query)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| limit | INT | NO | positive INT
+By default, the limit is set to 10
+
+#### Output
+Array of :
+| Field | type | description
+|-------|------|---------------------
+| count | Int | number of Joel for the stream
+| date | Date | date of the stream
+
+#### Example
+```
+https://server.venorrak.dev/api/joels/channels/history/venorrak
+https://server.venorrak.dev/api/joels/channels/history/venorrak?limit=20
+```
+
+<hr>
+
+### Get all shortened links
+Get an array of all the codes for the urls that were shortened.
+
+To access the original link (redirect) you need to go to this adress :
+https://server.venorrak.dev/link/yourCode
+
+URL : https://server.venorrak.dev/api/link
+
+#### Output
+Array of :
+| Field | type | description
+|-------|------|---------------------
+| hash | String | code of the url
+| url | String | redirected url
+
+#### Example
+```
+https://server.venorrak.dev/api/link
+```
