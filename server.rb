@@ -78,14 +78,14 @@ def getUserRarity(name, client)
     nbOfUsersUnder = client.query("SELECT COUNT(*) AS 'nbOfUsersUnder' FROM joels WHERE count <= (SELECT count FROM joels WHERE user_id = (SELECT id FROM users WHERE name = '#{name}'))").first
     nbOfUsersUnder = nbOfUsersUnder["nbOfUsersUnder"]
     nbOfUsers = client.query("SELECT COUNT(*) AS 'nbOfUsers' FROM joels").first["nbOfUsers"]
-    return ((nbOfUsersUnder.to_f / nbOfUsers.to_f) * 100).round(4)
+    return (100 - ((nbOfUsersUnder.to_f / nbOfUsers.to_f) * 100)).round(4)
 end
 
 def getChannelRarity(name, client)
     nbOfChannelsUnder = client.query("SELECT COUNT(*) AS 'nbOfChannelsUnder' FROM channelJoels WHERE count <= (SELECT count FROM channelJoels WHERE channel_id = (SELECT id FROM channels WHERE name = '#{name}'))").first
     nbOfChannelsUnder = nbOfChannelsUnder["nbOfChannelsUnder"]
     nbOfChannels = client.query("SELECT COUNT(*) AS 'nbOfChannels' FROM channelJoels").first["nbOfChannels"]
-    return ((nbOfChannelsUnder.to_f / nbOfChannels.to_f) * 100).round(4)
+    return (100 - ((nbOfChannelsUnder.to_f / nbOfChannels.to_f) * 100)).round(4)
 end
 
 def getChannelHistory(name, client, limit)
@@ -372,6 +372,15 @@ get '/link/qr/:name' do
         ]
     end
 
+end
+
+post '/titify' do
+    req = JSON.parse(request.body.read)
+    pp req
+    p request.ip
+    if request.ip = "18.236.59.34"
+        p "salut c'est titify"
+    end
 end
 
 #-----------------------------------------------------------------------#
