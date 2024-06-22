@@ -6,6 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Venorrak - Channel</title>
+    <meta property="og:title" content="Venorrak - Channel">
+    <meta property="og:description" content="Venorrak's website">
+    <meta property="og:image" content="/pictures/LOGO.png">
+    <meta property="og:url" content="https://server.venorrak.dev/joels/channels">
+    <meta property="og:type" content="website">
+
     <link rel="icon" href= "/pictures/LOGO.png" type="image/x-icon"/>
     <style>
         body {
@@ -200,7 +206,7 @@
                 his = response.history;
             })
             .then(function(){
-                document.getElementById('name-title').innerHTML = `
+                document.getElementById('name-title').innerText = `
                     ${name}
                 `;
                 document.getElementById('date').innerText = `
