@@ -3,10 +3,10 @@ require "openssl"
 require 'absolute_time'
 require "net/http"
 require "rqrcode"
+require "awesome_print"
 
 gemfile do
     source "http://rubygems.org"
-
     gem "sinatra-contrib"
     gem "rackup"
     gem "webrick"
@@ -33,6 +33,13 @@ client.query("USE joelScan;")
 NTFYDerver = Faraday.new(url: "https://ntfy.venorrak.dev") do |conn|
     conn.request :url_encoded
 end
+
+# $api_token = ""
+# $refresh_token = ""
+
+# $tiltify_api = Faraday.new(url: "https://v5api.tiltify.com/") do |conn|
+#     conn.request :url_encoded
+# end
 
 #-----------------------------------------------------------------------#
 #------------------------------FUNCTIONS--------------------------------#
@@ -91,14 +98,14 @@ end
 def getChannelHistory(name, client, limit)
     history = []
     channel_id = client.query("SELECT id FROM channels WHERE name = '#{name}'").first["id"]
-    client.query("SELECT streamDate, count FROM streamJoels WHERE channel_id = #{channel_id} ORDER BY streamDate ASC LIMIT #{limit}").each do |row|
+    client.query("SELECT streamDate, count FROM streamJoels WHERE channel_id = #{channel_id} ORDER BY streamDate DESC LIMIT #{limit}").each do |row|
         data = {
             "date": row["streamDate"],
             "count": row["count"]
         }
         history << data
     end
-    return history
+    return history.reverse
 end
 
 def rebootSQLconnection()
@@ -374,15 +381,6 @@ get '/link/qr/:name' do
 
 end
 
-post '/titify' do
-    req = JSON.parse(request.body.read)
-    pp req
-    p request.ip
-    if request.ip = "18.236.59.34"
-        p "salut c'est titify"
-    end
-end
-
 #-----------------------------------------------------------------------#
 #--------------------------------- API ---------------------------------#
 #-----------------------------------------------------------------------#
@@ -608,3 +606,69 @@ Thread.start do
         client.query("SELECT 1")
     end
 end
+
+####################################
+
+# get '/tiltify/activate' do
+#     if request.ip == "74.210.146.160"
+#         response = $tiltify_api.get("/oauth/authorize?client_id=#{$client_id}&response_type=code&redirect_uri=https://server.venorrak.dev/tiltify/code") do |req|
+#             req.headers["Authorization"] = "Bearer #{$access_token}"
+#         end
+#         return [
+#             307,
+#             { "Location" => response.headers["location"]},
+#             ""
+#         ]
+#     end
+# end 
+
+# get '/tiltify/code' do
+#     if request.ip == "74.210.146.160"
+#         code = params[:code]
+#         if code != nil
+#             response = $tiltify_api.post("/oauth/token?client_id=#{$client_id}&client_secret=#{$client_secret}&grant_type=authorization_code&code=#{code}&redirect_uri=https://server.venorrak.dev/tiltify/code") do |req|
+#                 req.headers["Authorization"] = "Bearer #{$access_token}"
+#             end
+#             begin
+#                 rep = JSON.parse(response.body)
+#                 $api_token = rep["access_token"]
+#                 $refresh_token = rep["refresh_token"]
+#                 p "got both tokens"
+#             rescue
+#                 p "continue"
+#             end
+#         else
+#             rep = JSON.parse(response.body)
+#             $api_token = rep["access_token"]
+#             $refresh_token = rep["refresh_token"]
+#             p "got both tokens"
+#         end
+#     end
+# end
+
+# get '/tiltify/rewards' do
+#     if request.env["HTTP_AUTHORIZATION"] == "prodIsAwesome"
+#         response = $tiltify_api.get("/api/public/campaigns/#{$campaign_id}/rewards") do |req|
+#             req.headers["Authorization"] = "Bearer #{$api_token}"
+#         end
+#         return response.body
+#     end
+# end
+
+# def refresh_token()
+#     p $refresh_token
+#     response = $tiltify_api.post("/oauth/token?client_id=#{$client_id}&client_secret=#{$client_secret}&grant_type=refresh_token&refresh_token=#{$refresh_token}") do |req|
+#         req.headers["Authorization"] = "Bearer #{$access_token}"
+#     end
+#     rep = JSON.parse(response.body)
+#     $api_token = rep["access_token"]
+#     $refresh_token = rep["refresh_token"]
+# end
+
+# Thread.start do 
+#     loop do
+#         sleep(7100)
+#         refresh_token()
+#         p "refreshed token"
+#     end
+# end
