@@ -12,7 +12,6 @@
     <meta property="og:url" content="https://server.venorrak.dev/joels/users">
     <meta property="og:type" content="website">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -211,10 +210,13 @@
                 table.innerHTML = '<tr><th onclick="sortName()" id="name">User</th><th onclick="sortDate()" id="date">Since</th><th onclick="sortCount()" id="count">Count</th></tr>';
                 for( const u of users){
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><a href="/joels/users?name=${DOMPurify.sanitize(u.name)}">${DOMPurify.sanitize(u.name)}</a></td><td>${u.date}</td><td>${u.count}</td>`;
+                    tr.innerHTML = `<td><a href="/joels/users?name=${purifyString(u.name)}">${purifyString(u.name)}</a></td><td>${u.date}</td><td>${u.count}</td>`;
                     table.appendChild(tr);
                 }
                 color();
+            }
+            function purifyString(string) {
+                return string.replace(/<[^>]+>/g, '');
             }
             getUserData();
         </script>
