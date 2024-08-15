@@ -8,12 +8,14 @@ require "awesome_print"
 gemfile do
     source "http://rubygems.org"
     gem "sinatra-contrib"
+    gem "sinatra-cross_origin"
     gem "rackup"
     gem "webrick"
     gem "mysql2"
     gem "faraday"
 end
 
+require 'sinatra/cross_origin'
 require "json"
 require 'sinatra'
 require "mysql2"
@@ -25,6 +27,21 @@ require_relative "env.rb"
 set :port, 4567
 set :bind, '0.0.0.0'
 enable :sessions
+
+#prod stuff
+configure do
+    enable :cross_origin
+end
+before do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+end
+set :protection, :except => :frame_options
+set :allow_origin, :any
+set :allow_methods, [:get, :post, :options]
+set :allow_credentials, true
+set :max_age, "1728000"
+set :expose_headers, ['Content-Type']
+#don't touch
 
 client = Mysql2::Client.new(:host => "localhost", :username => "bot", :password => "joel")
 client.query("USE joelScan;")
