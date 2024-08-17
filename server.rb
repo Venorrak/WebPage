@@ -496,7 +496,8 @@ end
 
 get '/api/joels/users/:name' do
     begin
-        user = client.query("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp_id, users.bgp_id, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = '#{params[:name]}';").first rescue nil
+        request = client.prepare("SELECT users.name, users.creationDate AS 'date', joels.count, users.pfp_id, users.bgp_id, users.twitch_id FROM users join joels on joels.user_id = users.id WHERE users.name = ?;")
+        user = request.execute(params[:name]).first rescue nil
         
         if user == nil
             return [
@@ -534,7 +535,8 @@ end
 
 get '/api/joels/channels/:name' do
     begin
-        channel = client.query("SELECT channels.name, channels.creationDate AS 'date', channelJoels.count FROM channels join channelJoels on channelJoels.channel_id = channels.id WHERE channels.name = '#{params[:name]}';").first
+        request = client.prepare("SELECT channels.name, channels.creationDate AS 'date', channelJoels.count FROM channels join channelJoels on channelJoels.channel_id = channels.id WHERE channels.name = ?;")
+        channel = request.execute(params[:name]).first
         if channel == nil
             return [
                 404,
@@ -570,7 +572,8 @@ get '/api/joels/channels/history/:name' do
     channel_name = nil
     channel_id = nil
     begin
-        client.query("SELECT name, id FROM channels WHERE name = '#{params[:name]}' LIMIT 1").each do |row|
+        request = client.prepare("SELECT name, id FROM channels WHERE name = ? LIMIT 1")
+        request.execute(params[:name]).each do |row|
             channel_name = row["name"]
             channel_id = row["id"]
         end
