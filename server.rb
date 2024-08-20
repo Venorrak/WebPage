@@ -36,6 +36,7 @@ before do
     response.headers['Access-Control-Allow-Origin'] = '*'
 end
 set :protection, :except => :frame_options
+set :protection, :except => [:json_csrf]
 set :allow_origin, :any
 set :allow_methods, [:get, :post, :options]
 set :allow_credentials, true
