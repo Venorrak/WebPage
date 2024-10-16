@@ -1,0 +1,241 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+}
+
+/* Navigation bar */
+header {
+    background-color: #00215E;
+    color: #fff;
+}
+
+nav {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+}
+
+nav a {
+    text-decoration: none;
+    color: #FC4100;
+    margin: 10px;
+    display: flex;
+    align-items: baseline;
+}
+
+.bbold{
+    font-size: x-large;
+}
+
+nav a:hover{
+    color: #942500;
+}
+
+/* Main content */
+
+.content-container {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modules-list {
+    display:  flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.module {
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #00215E;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 40%;
+    background-color: #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.module .links {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: left;
+    width: 100%;
+}
+
+.module a {
+    text-decoration: none;
+    color: #FC4100;
+    text-decoration-line: underline;
+}
+
+.module h2 {
+    color: #00215E;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+modules-list-main-header {
+    color: #FC4100;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/* Portfolio */
+
+.portfolio-item {
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #00215E;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    max-width: 90%;
+    width: 800px;
+}
+
+.portfolio-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-shrink: 1;
+    flex-grow: 3;
+    min-width: 200px;
+}
+
+.portfolio-item-info .date {
+    margin: 5px;
+    color: #2c4e80ce;
+}
+
+.portfolio-item-info .title {
+    margin: 5px;
+}
+
+.portfolio-item-info .description {
+    margin-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    margin-right: 5px;
+}
+
+.portfolio-item-info .links {
+    display: flex;
+    gap: 10px;
+    align-items: left;
+    width: 100%;
+}
+
+.portfolio-item-picture {
+    display: flex;
+    flex-shrink: 1;
+    max-height: 300px;
+    max-width: 300px;
+    min-width: 100px;
+    min-height: 100px;
+    width: auto;
+    height: auto;
+    justify-content: center;
+}
+
+/* lists */
+
+.joelList {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.joelList th,
+.joelList td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-collapse: collapse;
+    width: calc(100% / 3);
+    /* Equal width for all columns */
+}
+
+.joelList th {
+    background-color: #2C4E80;
+    color: #FC4100;
+}
+
+.joelList tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.joelList tr:hover {
+    background-color: #ddd;
+}
+.toolIcon{
+    max-width: 25px;
+    height: auto;
+}
+.icons{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-left: 5px;
+    align-items: baseline;
+}
+
+/* profile */
+
+.profile {
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #00215E;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 80%;
+    width: 800px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.profile p, h2 {
+    width: 100%;
+    text-align: center;
+    margin: 0px;
+}
+
+.profile-picture {
+    max-width: 300px;
+    max-height: 300px;
+    margin: 10px;
+}
+
+.twitch-icon {
+    max-width: 50px;
+}
+
+#chart {
+    width: 100%;
+}
+
+#not-banner {
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}

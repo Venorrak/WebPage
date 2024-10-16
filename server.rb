@@ -2,7 +2,6 @@ require "bundler/inline"
 require "openssl"
 require 'absolute_time'
 require "net/http"
-require "rqrcode"
 require "awesome_print"
 
 gemfile do
@@ -21,7 +20,6 @@ require 'sinatra'
 require "mysql2"
 require "faraday"
 require 'securerandom'
-require_relative "auth.rb"
 require_relative "env.rb"
 
 set :port, 4567
@@ -74,31 +72,6 @@ def sendNotif(message, title)
     p rep.body
 end
 
-def guard!
-    auth_required = [
-      401,
-      {
-        "Content-Type" => "application/json",
-      },
-      "Invalid credentials".to_json
-    ]
-  
-    # HALT interrompt IMMEDIATEMENT la requête et retourne le resultat
-    halt auth_required unless authorized?
-end
-  
-def authorized?
-    auth ||=  Rack::Auth::Basic::Request.new(request.env) 
-    # request.env est disponible car on est dans le block HELPERS
-    p "session : #{session[:username]}"
-    p "verified : #{session[:verified]}"
-    if session[:username].nil?
-        return unless auth.provided? && auth.basic? && auth.credentials
-        username, password = auth.credentials
-        $loginInfo = authenticate(username, password)
-    end
-end
-
 def getUserRarity(name, client)
     nbOfUsersUnder = client.query("SELECT COUNT(*) AS 'nbOfUsersUnder' FROM joels WHERE count <= (SELECT count FROM joels WHERE user_id = (SELECT id FROM users WHERE name = '#{name}'))").first
     nbOfUsersUnder = nbOfUsersUnder["nbOfUsersUnder"]
@@ -134,23 +107,6 @@ def rebootSQLconnection()
     p "rebooting SQL connection"
 end
 
-def getQRCode(data)
-    qr = RQRCode::QRCode.new(data)
-    png = qr.as_png(
-        bit_depth: 1,
-        border_modules: 4,
-        color_mode: ChunkyPNG::COLOR_GRAYSCALE,
-        color: 'black',
-        file: nil,
-        fill: 'white',
-        module_px_size: 6,
-        resize_exactly_to: false,
-        resize_gte_to: false,
-        size: 400
-    )
-    return png
-end
-
 #-----------------------------------------------------------------------#
 #------------------------------HTML ROUTES------------------------------#
 #-----------------------------------------------------------------------#
@@ -179,224 +135,17 @@ get '/joels/channels' do
     end
 end
 
-get '/manage' do
-    guard!
-    return send_file "html/manage.html"
-end
-
-get '/login' do
-    return send_file "html/login.html"
-end
-
-get '/link' do
-    return send_file "html/links.html"
-end
-
 #-----------------------------------------------------------------------#
 #------------------------------ACTIONS ROUTES---------------------------#
 #-----------------------------------------------------------------------#
-
-get '/login/status' do
-    if !session[:username].nil?
-        return [
-            200,
-            { "Content-Type" => "application/json" },
-            {status: "connected"}.to_json
-        ]
-    else
-        return [
-            401,
-            { "Content-Type" => "application/json" },
-            {status: "not connected"}.to_json
-        ]
-    end
-end
-
-post '/login' do
-    guard!
-    if !session
-        return [
-            401,
-            { "Content-Type" => "application/json" },
-            "bad credentials"
-        ]
-    else
-        p "login info : #{$loginInfo}"
-        session[:username] = $loginInfo[:username]
-        p "session : #{session[:username]}"
-        return [
-            200,
-            { "Content-Type" => "application/json" },
-            "connected"
-        ]
-    end
-end
-
-get '/logout' do
-    session.clear
-    return [
-      200,
-      { "Content-Type" => "application/json" },
-      {status: "logged out"}.to_json
-    ]
-end
-
-post '/login/sendCode' do
-    code = SecureRandom.alphanumeric(6).upcase
-    session[:code] = code
-    p session[:code]
-    sendNotif("Your code is : #{code}", "2FA code")
-    sleep(60)
-    p "code expired verif : #{session[:verified]}"
-    unless session[:verified] == true
-        session.clear
-        p "session cleared"
-        return [
-            401,
-            { "Content-Type" => "application/json" },
-            {status: "not connected"}.to_json
-        ]
-    end
-    return [
-        200,
-        { "Content-Type" => "application/json" },
-        {status: "connected"}.to_json
-    ]
-end
-
-post '/login/verify' do
-    data = JSON.parse(request.body.read)
-    p data
-    p session[:code]
-    if data["code"].upcase == session[:code]
-
-        session[:verified] = true
-        p "verified"
-        p session[:verified]
-        p session[:username]
-        p session[:code]
-        return [
-            200,
-            { "Content-Type" => "application/json" },
-            {status: "connected"}.to_json
-        ]
-    else
-        p "wrong 2fa"
-        session.clear
-        return [
-            401,
-            { "Content-Type" => "application/json" },
-            {status: "not connected"}.to_json
-        ]
-    end
-end
 
 get '/pictures/:filename' do
     p params[:filename]
     send_file "#{__dir__}/pictures/#{params[:filename]}"
 end
 
-get '/link/:name' do
-    alpha = params[:name]
-    file = File.open("link.json")
-    file_data = JSON.parse(file.read)
-    exists = false
-    redirectUrl = nil
-    file_data.each do |data|
-        if data["hash"] == alpha
-            redirectUrl = data["url"]
-            exists = true
-        end
-    end
-    if exists
-        return[
-            307,
-            { "Location" => redirectUrl},
-            ""
-        ]
-    else
-        return [
-            404,
-            { "Content-Type" => "application/json" },
-            {error: "link not found"}.to_json
-        ]
-    end
-end
-
-post '/link' do
-    req = JSON.parse(request.body.read)
-    client_ip = request.ip
-    url = req["url"] rescue nil
-    p "url: #{url}"
-    alpha = Random.alphanumeric(6)
-    file = File.open("link.json")
-    file_data = JSON.parse(file.read)
-    uri = URI(url)
-    res = Net::HTTP.get_response(uri) rescue nil
-    if (res.nil?)
-        return [
-            400,
-            { "Content-Type" => "application/json" },
-            {error: "bad url"}.to_json
-        ]
-    end
-    # count the amount of links with the same client_ip
-    numLinks = file_data.map { |link| client_ip == link["client_ip"] ? 1 : 0 }.sum
-    p numLinks
-    if numLinks >= 10
-        return [
-            400,
-            { "Content-Type" => "application/json" },
-            {error: "too many links"}.to_json
-        ]
-    end
-    hash = {
-        "hash": alpha,
-        "url": url,
-        "client_ip": client_ip
-    }
-    file_data.push(hash)
-    File.open("link.json", "w") do |f|
-        f.write(file_data.to_json)
-    end
-    return [
-        201,
-        { "Content-Type" => "application/json" },
-        {
-            hash: alpha,
-            url: url
-        }.to_json
-    ]
-end
-
-get '/link/qr/:name' do
-    alpha = params[:name]
-    file = File.open("link.json")
-    file_data = JSON.parse(file.read)
-    exists = false
-    redirectUrl = nil
-    qr = nil
-    file_data.each do |data|
-        if data["hash"] == alpha
-            redirectUrl = data["url"]
-            exists = true
-        end
-    end
-    if exists
-        qr = getQRCode(redirectUrl)
-        IO.binwrite("qrcode.png", qr.to_s)
-        return [
-            200,
-            send_file("qrcode.png")
-        ]
-    else
-        return [
-            404,
-            { "Content-Type" => "application/json" },
-            {error: "link not found"}.to_json
-        ]
-    end
-
+get '/css/:filename' do
+    return send_file "#{__dir__}/css/#{params[:filename]}"
 end
 
 #-----------------------------------------------------------------------#
@@ -601,22 +350,6 @@ get '/api/joels/channels/history/:name' do
     end
 end
 
-get '/api/link' do
-    file = File.open("link.json")
-    file_data = JSON.parse(file.read)
-    returnLinks = Array.new
-    file_data.each do |link|
-        returnLinks.push({
-            "hash": link["hash"],
-            "url": link["url"]
-        })
-    end
-    return [
-        200,
-        { "Content-Type" => "application/json" },
-        returnLinks.to_json
-    ]
-end
 #-----------------------------------------------------------------------#
 #--------------------------------OTHER----------------------------------#
 #-----------------------------------------------------------------------#

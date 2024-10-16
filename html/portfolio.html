@@ -12,180 +12,78 @@
     <meta property="og:url" content="https://server.venorrak.dev/portfolio">
     <meta property="og:type" content="website">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        nav {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #333;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-
-        nav a:hover, button:hover {
-            background-color: #666;
-            color: #fff;
-        }
-
-        nav div {
-            display: inline-block;
-        }
-
-        .dropdown .dropbtn {
-            text-decoration: none;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            /* Set position to absolute */
-            background-color: #f1f1f1;
-            min-width: 120px;
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: #333;
-            padding: 10px 20px;
-            text-decoration: none;
-            display: block;
-            margin: 0px;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #666;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        .portfolio-item {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .portfolio-item img {
-            width: 100%;
-            height: auto;
-        }
-
-        .portfolio-item-content {
-            padding: 20px;
-        }
-
-        .portfolio-item-title {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .portfolio-item-description {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-        }
-        .portfolio-item-icons {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            width: 100%;
-        }
-        .github-icon {
-            width: 7%;
-            height: 7%;
-            margin-right: 20px;
-            margin-top: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/default.css">
 </head>
 
 <body>
     <header>
-        <h1>Portfolio</h1>
         <nav>
-            <a href="/">Home</a>
-            <a href="#">Portfolio</a>
-            <div class="dropdown">
-                <a class="dropbtn">Joel stats</a>
-                <div class="dropdown-content">
-                    <a href="/joels/users">Users</a>
-                    <a href="/joels/channels">channels</a>
-                </div>
-            </div>
-            <a href="/link">Short Link</a>
-            <a href="/login">Login</a>
+            <a href="/"><b class="bbold">Venorrak</b><b>'s website</b></a>
         </nav>
     </header>
 
-    <div class="container">
+    <div class="content-container">
+        <h2 class="modules-list-main-header">My Projects</h2>
         <section class="portfolio-item">
-            <div class="portfolio-item-icons">
-                <img src="/pictures/Joel.jpg" alt="Joel" style="height: 30%;width: 30%;display: inline-block;">
-                <a href="https://github.com/Venorrak/JoelBot" style="float: right;" class="github-icon" target="_blank"><img src="/pictures/github.png" alt="github" class="github-icon"></a>
+            <div class="portfolio-item-info">
+                <p class="date">Apr 2024</p>
+                <h2 class="title">
+                    Joel Bot
+                </h2>
+                <p class="description">
+                    The Joel Bot is a Twitch bot that tracks the amount of time people say "Joel" in a tracked stream. To see the data collected, you can visit the website or use the commands while in a channel that has the bot. 
+                </p>
+                <div class="links">
+                    <a href="https://github.com/Venorrak/JoelBot">Github</a>
+                </div>
             </div>
-            <div class="portfolio-item-content">
-                <h2 class="portfolio-item-title">Joel bot</h2>
-                <p class="portfolio-item-description">ruby based twitch bot that tracks how many times people say Joel in selected channels</p>
-            </div>
+            <img class="portfolio-item-picture" src="pictures/Joel.jpg" alt="Project picture">
         </section>
-
         <section class="portfolio-item">
-            <div class="portfolio-item-icons">
-                <img src="/pictures/synth.jpg" alt="Synth" style="height: 30%;width: 30%;display: inline-block;">
-                <a href="https://github.com/Venorrak/Synthesiser_v1" style="float: right;" class="github-icon" target="_blank"><img src="/pictures/github.png" alt="github" class="github-icon"></a>
+            <div class="portfolio-item-info">
+                <p class="date">Apr 2024</p>
+                <h2 class="title">
+                    DIY synthetizer
+                </h2>
+                <p class="description">
+                    Synthesizer that can be made with basic soldering skills. Uses a midi keyboard to play notes with different effects. Based on the <a href="https://electro-smith.com/products/daisy-seed">daisy seed board</a>
+                </p>
+                <div class="links">
+                    <a href="https://github.com/Venorrak/Synthesiser_v1">Github</a>
+                </div>
             </div>
-            <div class="portfolio-item-content">
-                <h2 class="portfolio-item-title">DIY synthesizer</h2>
-                <p class="portfolio-item-description">Synthesizer that can be made with basic soldering skills. Uses a midi keyboard to play notes with different effects. Based on the <a href="https://electro-smith.com/products/daisy-seed">daisy seed board</a>.</p>
-            </div>
+            <img class="portfolio-item-picture" src="pictures/synth.jpg" alt="Project picture">
         </section>
-
         <section class="portfolio-item">
-            <div class="portfolio-item-icons">
-                <img src="/pictures/website.png" alt="Website" style="height: auto;width: 35%; display: inline-block;border: 1px solid #333;">
-                <a href="https://github.com/Venorrak/WebPage"style="float: right;" class="github-icon" target="_blank"><img src="/pictures/github.png" alt="github" class="github-icon"></a>
+            <div class="portfolio-item-info">
+                <p class="date">Jan 2024</p>
+                <h2 class="title">
+                    Website
+                </h2>
+                <p class="description">
+                    This is a personnal website made with html, css and ruby. Is used to display different projects and tools
+                </p>
+                <div class="links">
+                    <a href="https://github.com/Venorrak/WebPage">Github</a>
+                </div>
             </div>
-            <div class="portfolio-item-content">
-                <h2 class="portfolio-item-title">Website</h2>
-                <p class="portfolio-item-description">This is a personnal website made with html, css and ruby. Is used to display different projects and tools</p>
-            </div>
+            <img class="portfolio-item-picture" src="pictures/website.png" alt="Project picture">
         </section>
-
+        <section class="portfolio-item">
+            <div class="portfolio-item-info">
+                <p class="date">Oct 2024</p>
+                <h2 class="title">
+                    Toast Curling
+                </h2>
+                <p class="description">
+                    A game made with godot engine where you play curling with toasts. It was made in the context of a game making class.
+                </p>
+                <div class="links">
+                    <a href="https://github.com/Venorrak/toast">Github</a>
+                </div>
+            </div>
+            <img class="portfolio-item-picture" src="pictures/ToastCurling.png" alt="Project picture">
+        </section>
     </div>
 </body>
 

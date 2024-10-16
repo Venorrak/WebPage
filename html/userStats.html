@@ -12,150 +12,30 @@
     <meta property="og:url" content="https://server.venorrak.dev/joels/users">
     <meta property="og:type" content="website">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        nav {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #333;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-
-        nav a:hover,
-        button:hover {
-            background-color: #666;
-            color: #fff;
-        }
-
-        nav div {
-            display: inline-block;
-        }
-
-        .dropdown .dropbtn {
-            text-decoration: none;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            /* Set position to absolute */
-            background-color: #f1f1f1;
-            min-width: 120px;
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: #333;
-            padding: 10px 20px;
-            text-decoration: none;
-            display: block;
-            margin: 0px;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #666;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .container {
-            max-width: 70%;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        .userList {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .userList th,
-        .userList td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 2px solid #ddd;
-            border-collapse: collapse;
-            width: calc(100% / 3);
-            /* Equal width for all columns */
-        }
-
-        .userList th {
-            background-color: #666;
-            color: white;
-        }
-
-        .userList tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .userList tr:hover {
-            background-color: #ddd;
-        }
-        .toolIcon{
-            width: 2%;
-            height: auto;
-            margin-right: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/default.css">
 </head>
 
+<script>
+    var sort_way = "DESC"
+    var sort = "count"
+</script>
+
 <body>
-    <script>
-        var sort_way = "DESC"
-        var sort = "count"
-    </script>
     <header>
-        <h1>User Stats</h1>
         <nav>
-            <a href="/">Home</a>
-            <a href="/portfolio">Portfolio</a>
-            <div class="dropdown">
-                <a class="dropbtn">Joel stats</a>
-                <div class="dropdown-content">
-                    <a href="#">Users</a>
-                    <a href="/joels/channels">channels</a>
-                </div>
-            </div>
-            <a href="/link">Short Link</a>
-            <a href="/login">Login</a>
+            <a href="/"><b class="bbold">Venorrak</b><b>'s website</b></a>
         </nav>
     </header>
 
-    <div class="container" style="width: 70%;">
-        <img onclick="sortWay()" src="/pictures/sort.png" alt="sort" class="toolIcon">
-        <img onclick="refresh()" src="/pictures/refresh.png" alt="refresh" class="toolIcon">
-        <table class="userList" id="table-user">
-        </table>
+    <div class="content-container">
+        <div class="icons">
+            <img onclick="sortWay()" src="/pictures/sort.png" alt="sort" class="toolIcon">
+            <img onclick="refresh()" src="/pictures/refresh.png" alt="refresh" class="toolIcon">
+            <a href="/joels/channels">Switch to channels</a>
+        </div>
+
+        <table class="joelList" id="table-user"></table>
+
         <script>
             function sortName(){
                 sort = "name";
@@ -186,19 +66,19 @@
                 const count = document.getElementById('count');
                 switch(sort){
                     case "name":
-                        name.style.backgroundColor = "#666";
-                        date.style.backgroundColor = "#333";
-                        count.style.backgroundColor = "#333";
+                        name.style.backgroundColor = "#2C4E80";
+                        date.style.backgroundColor = "#00215E";
+                        count.style.backgroundColor = "#00215E";
                         break;
                     case "creationDate":
-                        name.style.backgroundColor = "#333";
-                        date.style.backgroundColor = "#666";
-                        count.style.backgroundColor = "#333";
+                        name.style.backgroundColor = "#00215E";
+                        date.style.backgroundColor = "#2C4E80";
+                        count.style.backgroundColor = "#00215E";
                         break;
                     case "count":
-                        name.style.backgroundColor = "#333";
-                        date.style.backgroundColor = "#333";
-                        count.style.backgroundColor = "#666";
+                        name.style.backgroundColor = "#00215E";
+                        date.style.backgroundColor = "#00215E";
+                        count.style.backgroundColor = "#2C4E80";
                         break;
                 }
             }
