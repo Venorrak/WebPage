@@ -6,6 +6,9 @@
 - rackup
 - webrick
 - mysql2
+- faraday
+- awesome_print
+- absolute_time
 
 ## Description
 This website is made to display my different projects and to be used as a tool for different projects.
@@ -149,22 +152,32 @@ https://server.venorrak.dev/api/joels/channels/history/venorrak?limit=20
 
 <hr>
 
-### Get all shortened links
-Get an array of all the codes for the urls that were shortened.
+### Get User history :
+Get number of Joel for each stream of the selected user
 
-To access the original link (redirect) you need to go to this adress :
-https://server.venorrak.dev/link/yourCode
+URL : https://server.venorrak.dev/api/joels/users/history/twitchname
 
-URL : https://server.venorrak.dev/api/link
+#### Input (url)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| name | String | Yes | name of a registered User
+
+#### Input (query)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| limit | INT | NO | positive INT
+By default, the limit is set to 10
 
 #### Output
 Array of :
 | Field | type | description
 |-------|------|---------------------
-| hash | String | code of the url
-| url | String | redirected url
+| count | Int | number of Joel for the stream
+| date | Date | date of the stream
+| channel_name | String | name of the streamer hosting the stream 
 
 #### Example
 ```
-https://server.venorrak.dev/api/link
+https://server.venorrak.dev/api/joels/users/history/venorrak
+https://server.venorrak.dev/api/joels/users/history/venorrak?limit=20
 ```
