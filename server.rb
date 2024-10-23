@@ -86,12 +86,24 @@ def getChannelRarity(name, client)
     return (100 - ((nbOfChannelsUnder.to_f / nbOfChannels.to_f) * 100)).round(4)
 end
 
-def getChannelHistory(name, client, limit)
+def getChannelHistory(channel_id, client, limit)
     history = []
-    channel_id = client.query("SELECT id FROM channels WHERE name = '#{name}'").first["id"]
     client.query("SELECT streamDate, count FROM streamJoels WHERE channel_id = #{channel_id} ORDER BY streamDate DESC LIMIT #{limit}").each do |row|
         data = {
             "date": row["streamDate"],
+            "count": row["count"]
+        }
+        history << data
+    end
+    return history.reverse
+end
+
+def getUserHistory(user_id, client, limit)
+    history = []
+    client.query("SELECT streamJoels.streamDate, channels.name AS 'channel_name', streamUsersJoels.count FROM streamUsersJoels JOIN streamJoels ON streamJoels.id = streamUsersJoels.stream_id JOIN channels ON channels.id = streamJoels.channel_id WHERE streamUsersJoels.user_id = #{user_id} ORDER BY streamJoels.streamDate DESC LIMIT #{limit}").each do |row|
+        data = {
+            "date": row["streamDate"],
+            "channel_name": row["channel_name"],
             "count": row["count"]
         }
         history << data
@@ -318,23 +330,58 @@ get '/api/joels/channels/:name' do
 end
 
 get '/api/joels/channels/history/:name' do
-    limit = params[:limit] || 10
-    channel_name = nil
+    limit = params[:limit].to_i
+    if limit == 0
+        limit = 10
+    end
     channel_id = nil
     begin
-        request = client.prepare("SELECT name, id FROM channels WHERE name = ? LIMIT 1")
+        request = client.prepare("SELECT id FROM channels WHERE name = ? LIMIT 1")
         request.execute(params[:name]).each do |row|
-            channel_name = row["name"]
             channel_id = row["id"]
         end
-        if channel_name == nil
+        if channel_id == nil
             return [
                 404,
                 { "Content-Type" => "application/json" },
                 {error: "channel not found"}.to_json
             ]
         else
-            history = getChannelHistory(channel_name, client, limit)
+            history = getChannelHistory(channel_id, client, limit)
+            return [
+                200,
+                { "Content-Type" => "application/json" },
+                history.to_json
+            ]
+        end
+    rescue
+        return [
+            500,
+            { "Content-Type" => "application/json" },
+            {error: "internal server error"}.to_json
+        ]
+    end
+end
+
+get '/api/joels/users/history/:name' do
+    limit = params[:limit].to_i
+    if limit == 0
+        limit = 10
+    end
+    user_id = nil
+    begin
+        request = client.prepare("SELECT id FROM users WHERE name = ? LIMIT 1")
+        request.execute(params[:name]).each do |row|
+            user_id = row["id"]
+        end
+        if user_id == nil
+            return [
+                404,
+                { "Content-Type" => "application/json" },
+                {error: "user not found"}.to_json
+            ]
+        else
+            history = getUserHistory(user_id, client, limit)
             return [
                 200,
                 { "Content-Type" => "application/json" },
