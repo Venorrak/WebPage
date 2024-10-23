@@ -297,7 +297,7 @@ end
 
 get '/api/joels/channels/:name' do
     begin
-        request = client.prepare("SELECT channels.name, channels.creationDate AS 'date', channelJoels.count FROM channels join channelJoels on channelJoels.channel_id = channels.id WHERE channels.name = ?;")
+        request = client.prepare("SELECT channels.name, channels.id, channels.creationDate AS 'date', channelJoels.count FROM channels join channelJoels on channelJoels.channel_id = channels.id WHERE channels.name = ?;")
         channel = request.execute(params[:name]).first
         if channel == nil
             return [
@@ -311,7 +311,7 @@ get '/api/joels/channels/:name' do
                 "date": channel["date"],
                 "count": channel["count"],
                 "rarity": getChannelRarity(channel["name"], client),
-                "history": getChannelHistory(channel["name"], client, 10)
+                "history": getChannelHistory(channel["id"], client, 10)
             }
             return [
                 200,
