@@ -146,15 +146,8 @@ modules-list-main-header {
 }
 
 .portfolio-item-picture {
-    display: flex;
-    flex-shrink: 1;
-    max-height: 300px;
     max-width: 300px;
-    min-width: 100px;
-    min-height: 100px;
-    width: auto;
-    height: auto;
-    justify-content: center;
+    object-fit:scale-down;
 }
 
 /* lists */
