@@ -397,6 +397,72 @@ get '/api/joels/users/history/:name' do
     end
 end
 
+get '/api/joels/JCP/short' do
+    limit = params[:limit].to_i
+    minutes = params[:minutes].to_i
+    begin
+        requestString = "SELECT percentage as JCP, timestamp FROM JCPshort"
+        if minutes > 0
+            minutesAgo = Time.now - minutes * 60
+            requestString += " WHERE timestamp >= '#{minutesAgo.strftime('%Y-%m-%d %H:%M:%S')}'"
+        end
+        requestString += " ORDER BY timestamp DESC"
+        if limit > 0
+            requestString += " LIMIT #{limit}"
+        end
+        requestString += ";"
+        data = []
+        client.query(requestString).each do |row|
+            data << row
+        end
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            data.to_json
+        ]
+    rescue
+        return [
+            500,
+            { "Content-Type" => "application/json" },
+            {error: "internal server error"}.to_json
+        ]
+    end
+end
+
+get '/api/joels/JCP/long' do
+    limit = params[:limit].to_i
+    afterDate = params[:since]
+    afterDate = Time.parse(afterDate) rescue nil
+    begin
+        requestString = "SELECT percentage as JCP, timestamp FROM JCPlong"
+        if afterDate != nil
+            requestString += " WHERE timestamp >= '#{afterDate.strftime('%Y-%m-%d %H:%M:%S')}'"
+        end
+        requestString += " ORDER BY timestamp DESC"
+        if limit > 0
+            requestString += " LIMIT #{limit}"
+        else
+            requestString += " LIMIT 720"
+        end
+        requestString += ";"
+        data = []
+        client.query(requestString).each do |row|
+            data << row
+        end
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            data.to_json
+        ]
+    rescue
+        return [
+            500,
+            { "Content-Type" => "application/json" },
+            {error: "internal server error"}.to_json
+        ]
+    end
+end
+
 #-----------------------------------------------------------------------#
 #--------------------------------OTHER----------------------------------#
 #-----------------------------------------------------------------------#
