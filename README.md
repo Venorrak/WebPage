@@ -188,7 +188,7 @@ https://server.venorrak.dev/api/joels/users/history/venorrak?limit=20
 
 ### Get JCP short term history
 Get the JCP over the last 24 hours
-JCP is updated each 5 seconds when bot is online
+JCP is updated each 15 seconds when bot is online
 
 URL : https://server.venorrak.dev/api/joels/JCP/short
 
@@ -219,7 +219,7 @@ https://server.venorrak.dev/api/joels/JCP/short?minutes=30
 
 ### Get JCP long term history
 Get the JCP for all of its lifetime
-JCP is updated each hour when bot is online
+JCP is updated each minute when bot is online
 
 URL : https://server.venorrak.dev/api/joels/JCP/long
 
@@ -229,7 +229,7 @@ URL : https://server.venorrak.dev/api/joels/JCP/long
 | limit | INT | NO | positive INT
 | since | DATETIME | NO | YYYY-MM-DD HH:MM:SS
 
-By default, limit is set to 720 or almost 1 month
+By default, limit is set to 10,080 or 1 week
 
 "since" is used to get all JCP since the date specified
 

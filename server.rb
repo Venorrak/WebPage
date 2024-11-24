@@ -442,7 +442,7 @@ get '/api/joels/JCP/long' do
         if limit > 0
             requestString += " LIMIT #{limit}"
         else
-            requestString += " LIMIT 720"
+            requestString += " LIMIT 10080"
         end
         requestString += ";"
         data = []
