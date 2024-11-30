@@ -147,12 +147,15 @@ get '/joels/channels' do
     end
 end
 
+get '/joels/JCP' do
+    return send_file "html/JCP.html"
+end
+
 #-----------------------------------------------------------------------#
 #------------------------------ACTIONS ROUTES---------------------------#
 #-----------------------------------------------------------------------#
 
 get '/pictures/:filename' do
-    p params[:filename]
     send_file "#{__dir__}/pictures/#{params[:filename]}"
 end
 

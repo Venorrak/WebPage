@@ -1,0 +1,46 @@
+body {
+	font-family:Arial, Verdana, san-serif;
+	font-size:90%;
+	padding:0px;
+}
+.title {
+	padding:4px;
+	background-color: #ddd;
+	background-color: rgba(0,0,0,.1);
+	border-bottom: 1px solid #bbb;
+	border-bottom: 1px solid rgba(0,0,0,.2);
+}
+
+#maincontent {
+	padding:5px;
+}
+.title a {
+	font-size: 220%;
+	text-decoration:none;
+	color: #888;
+}
+.title a:hover {
+	text-decoration:underline;
+}
+
+.resultBox {
+	background-color:#f0f0f0;
+	border: 1px solid #aaa;
+}
+
+.resultHeader {
+	font-family:Arial, Verdana, san-serif;
+	font-size: 140%;
+	margin-bottom: 20px;
+}
+
+.instruct {
+	margin:30px 30px 5px 30px;
+	
+}
+.instruct code {
+	margin: 15px;
+	padding: 7px;
+	border: 1px solid #aaa;
+	display:block;
+}
