@@ -203,7 +203,7 @@
                             })
                             .then(response => response.json())
                             .then(function(response) {
-                                JCPs = response.reverse();
+                                JCPs = response;
                             })
                             .then(function() {
                                 drawChart();
@@ -235,7 +235,7 @@
 
             function drawChart() {
                 let chartData = [['Time', 'JCP']];
-                JCPs.forEach((element) => {
+                JCPs.reverse().forEach((element) => {
                     chartData.push([element.timestamp, element.JCP]);
                 });
 
