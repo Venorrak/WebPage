@@ -98,7 +98,7 @@
                                                             style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Significantly small Joel variance. Suggestive of deeply
+                                                            Almost no Joel variance. Suggestive of deeply
                                                             shared,
                                                             internally motivated Joel focus. The index is above 95%
                                                         </td>
@@ -110,7 +110,7 @@
                                                             style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Small Joel variance. Probably chance fluctuation. The index
+                                                            tiny Joel variance. Probably chance fluctuation. The index
                                                             is between 90% and 95%
                                                         </td>
                                                     </tr>
@@ -121,8 +121,7 @@
                                                             style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Normally random Joel variance. This is average or
-                                                            expected behavior. The index is between 40% and 90%
+                                                            Significantly small Joel variance. The index is between 40% and 90%
                                                         </td>
                                                     </tr>
 
@@ -132,7 +131,7 @@
                                                             style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Slightly increased Joel variance. The index is between 10% and 40%
+                                                            Slightly decreased Joel variance. The index is between 10% and 40%
                                                         </td>
                                                     </tr>
 
@@ -142,7 +141,8 @@
                                                             style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Strongly increased Joel variance. The index between 5% and 10%
+                                                            Normal Joel variance. This is average or
+                                                            expected behavior. The index between 5% and 10%
                                                         </td>
                                                     </tr>
 
@@ -152,7 +152,7 @@
                                                                 style="width:100;height:50;">
                                                         </td>
                                                         <td>
-                                                            Significantly large Joel variance. Suggests broadly
+                                                            Large Joel variance. Suggests broadly
                                                             shared coherence of Joel. The index is less than
                                                             5%
                                                         </td>
@@ -236,7 +236,7 @@
             function drawChart() {
                 let chartData = [['Time', 'JCP']];
                 JCPs.reverse().forEach((element) => {
-                    chartData.push([element.timestamp, element.JCP]);
+                    chartData.push([element.timestamp.split(" ")[1], element.JCP]);
                 });
 
                 var data = google.visualization.arrayToDataTable(chartData);
