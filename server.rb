@@ -151,6 +151,10 @@ get '/joels/JCP' do
     return send_file "html/JCP.html"
 end
 
+get '/recap' do
+    return send_file "html/recap.html"
+end
+
 #-----------------------------------------------------------------------#
 #------------------------------ACTIONS ROUTES---------------------------#
 #-----------------------------------------------------------------------#
@@ -464,6 +468,101 @@ get '/api/joels/JCP/long' do
             {error: "internal server error"}.to_json
         ]
     end
+end
+
+get '/api/joels/streams' do
+    listStreams = Array.new
+    limit = params[:limit].to_i
+    if limit == 0
+        limit = 3
+    end
+    way = params[:way]
+    if way != "ASC" && way != "DESC" && way != nil
+        return [
+            400,
+            { "Content-Type" => "application/json" },
+            {error: "bad request"}.to_json
+        ]
+    else
+        begin
+            if params[:sort] == nil
+                client.query("SELECT channels.name, streamJoels.count, streamJoels.streamDate AS 'date' FROM streamJoels INNER JOIN channels ON channels.id = streamJoels.channel_id LIMIT #{limit};").each do |row|
+                listStreams.push(row)
+                end
+            else
+                if params[:sort] == "count"
+                    client.query("SELECT channels.name, streamJoels.count, streamJoels.streamDate AS 'date' FROM streamJoels INNER JOIN channels ON channels.id = streamJoels.channel_id ORDER BY streamJoels.count #{way} LIMIT #{limit};").each do |row|
+                    listStreams.push(row)
+                    end
+                elsif params[:sort] == "Date"
+                    client.query("SELECT channels.name, streamJoels.count, streamJoels.streamDate AS 'date' FROM streamJoels INNER JOIN channels ON channels.id = streamJoels.channel_id ORDER BY streamJoels.streamDate #{way} LIMIT #{limit};").each do |row|
+                    listStreams.push(row)
+                    end
+                end
+            end
+            return [
+                200,
+                { "Content-Type" => "application/json" },
+                listStreams.to_json
+            ]
+        rescue => e
+            rebootSQLconnection()
+            return [
+                500,
+                { "Content-Type" => "application/json" },
+                {error: "internal server error"}.to_json
+            ]
+        end
+    end
+end
+
+get '/api/joels/stats/:name' do
+    begin
+        GetBasicStats = client.prepare("SELECT joels.count as totalJoels, users.creationDate as firstJoelDate FROM users JOIN joels ON users.id = joels.user_id WHERE users.name = ? LIMIT 1;")
+        GetMostJoelStreamStats = client.prepare("SELECT channels.name as MostJoelsInStreamStreamer, streamUsersJoels.count as mostJoelsInStream, streamJoels.streamDate as mostJoelsInStreamDate FROM users JOIN streamUsersJoels ON users.id = streamUsersJoels.user_id JOIN streamJoels ON streamUsersJoels.stream_id = streamJoels.id JOIN channels ON streamJoels.channel_id = channels.id WHERE users.name = ? AND streamUsersJoels.count = (SELECT MAX(streamUsersJoels.count) FROM streamUsersJoels WHERE user_id = users.id);")
+        GetMostJoeledStreamerStats = client.prepare("SELECT channels.name as mostJoeledStreamer, CAST(SUM(streamUsersJoels.count) AS INTEGER) as count FROM users JOIN streamUsersJoels ON users.id = streamUsersJoels.user_id JOIN streamJoels ON streamUsersJoels.stream_id = streamJoels.id JOIN channels ON streamJoels.channel_id = channels.id WHERE users.name = ? GROUP BY channels.id ORDER BY count DESC;")
+
+        name = params[:name].strip
+        basicStats = GetBasicStats.execute(name).first
+        mostJoelStreamStats = GetMostJoelStreamStats.execute(name).first
+        mostJoeledStreamerStats = GetMostJoeledStreamerStats.execute(name).first
+
+        if basicStats.nil? || mostJoelStreamStats.nil? || mostJoeledStreamerStats.nil?
+            return [
+                404,
+                { "Content-Type" => "application/json" },
+                {error: "user not found"}.to_json
+            ]
+        end
+
+        stats = {
+            name: name,
+            joelThisYear: basicStats["totalJoels"].to_i,
+            topStream: {
+                name: mostJoelStreamStats["MostJoelsInStreamStreamer"],
+                count: mostJoelStreamStats["mostJoelsInStream"].to_i,
+                date: mostJoelStreamStats["mostJoelsInStreamDate"]
+            },
+            topStreamer: {
+                name: mostJoeledStreamerStats["mostJoeledStreamer"],
+                count: mostJoeledStreamerStats["count"].to_i
+            }
+        }
+
+        return [
+            200,
+            { "Content-Type" => "application/json" },
+            stats.to_json
+        ]
+    rescue => e
+        p e
+        return [
+            500,
+            { "Content-Type" => "application/json" },
+            {error: "internal server error"}.to_json
+        ]
+    end
+
 end
 
 #-----------------------------------------------------------------------#
