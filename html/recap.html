@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venorrak - Recap</title>
+    <link rel="icon" href= "/pictures/LOGO.png" type="image/x-icon"/>
+    <meta property="og:title" content="Venorrak - Joel Recap">
+    <meta property="og:description" content="Venorrak's website">
+    <meta property="og:image" content="/pictures/LOGO.png">
+    <meta property="og:url" content="https://server.venorrak.dev/">
+    <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="/css/default.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="/"><b class="bbold">Venorrak</b><b>'s website</b></a>
+        </nav>
+    </header>
+
+    <div class="content-container">
+        <h1>
+           Joel Recap 2024 
+        </h1>
+
+        <!-- tap 3 most Joeled streamers -->
+        <div class="portfolio-item" style="width: 70%; flex-direction: column;">
+            <h2 class="title">
+                Top 3 most Joeled streamers
+            </h2>
+
+            <table class="joelList">
+                <tr>
+                    <th>Rank</th>
+                    <th>Streamer</th>
+                    <th>Joels</th>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥇</h1></td>
+                    <td id="streamerName1"></td>
+                    <td id="streamerCount1"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥈</h1></td>
+                    <td id="streamerName2"></td>
+                    <td id="streamerCount2"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥉</h1></td>
+                    <td id="streamerName3"></td>
+                    <td id="streamerCount3"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- tap 3 Joelers -->
+        <div class="portfolio-item" style="width: 70%; flex-direction: column;">
+            <h2 class="title">
+                Top 3 Joelers
+            </h2>
+
+            <table class="joelList">
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>Joels</th>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥇</h1></td>
+                    <td id="userName1"></td>
+                    <td id="userCount1"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥈</h1></td>
+                    <td id="userName2"></td>
+                    <td id="userCount2"></td>
+                </tr>
+                <tr>
+                    <td style="padding: 0px 0px;"><h1>🥉</h1></td>
+                    <td id="userName3"></td>
+                    <td id="userCount3"></td>
+                </tr>
+            </table>
+
+        </div>
+
+        <!-- Most Joeled stream -->
+        <div class="portfolio-item" style="width: 40%; flex-direction: column;">
+            <h2 class="title" >
+                Most Joeled stream
+            </h2>
+            <hr style="width: 100%; margin: 0px; margin-bottom: 20px; margin-top: 20px;">
+
+            <div style="flex-direction: row; display: flex;">
+
+                <div class="portfolio-item-info" style="gap: 10px;">
+                    <h2 id="topName"></h2>
+                    <h2 id="topDate"></h2>
+                    <h2 id="topCount"></h2>
+
+                </div>
+
+                <img id="topPfp" src="pictures/Joel.jpg" alt="" class="portfolio-item-picture" style="width: 25%;">
+            </div>
+        </div>
+
+        <br>
+        <hr size="1" width="100%">
+        <br>
+
+        <div class="portfolio-item" style="flex-direction: column;" >
+            <h2 class="title">
+                Personnal recap
+            </h2>
+            <div class="portfolio-item-info">
+                <p class="date">*anything related to top stream or top streamer is not an accurate data since it was implemented later in the year</p>
+            </div>
+
+            <br>
+
+            
+            <input id="search" type="text" placeholder="Search.." style="padding: 5px; height: 30px;">
+            <button onclick="searchForUser()" style="padding: 5px; border: none; height: 30px;">Search</button>
+
+            <div id="personnalRecap" style="display: flex; flex-direction: column; display: none;">
+                <h2 id="personnalName"></h2>
+                <hr size="1" width="100%">
+                <p id="personnalJoelThisYear"></p>
+                <hr size="1" width="100%">
+                <h4>Most Joeled Stream</h4>
+                <p id="personnalTopStreamName"></p>
+                <p id="personnalTopStreamDate"></p>
+                <p id="personnalTopStreamCount"></p>
+                <hr size="1" width="100%">
+                <h4>Most Joeled Streamer</h4>
+                <p id="personnalTopStreamerName"></p>
+                <p id="personnalTopStreamerCount"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('search').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchForUser();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            const topStreamersResponse = await getTopChannels();
+            const topJoelersResponse = await getTopUsers();
+            const mostJoeledStreamResponse = await getTopStream();
+
+            const topStreamers = await topStreamersResponse.json();
+            const topJoelers = await topJoelersResponse.json();
+            const mostJoeledStream = await mostJoeledStreamResponse.json();
+
+            if (topStreamers === undefined || topJoelers === undefined || mostJoeledStream === undefined) {
+                console.error('Error while fetching data');
+                return;
+            }
+            if (topStreamers.length < 3 || topJoelers.length < 3 || mostJoeledStream.length < 1) {
+                console.error('Error while fetching data');
+                return;
+            }
+
+            const mostJoeledStreamUserResponse = await getTopStreamUser(mostJoeledStream[0].name);
+            const mostJoeledStreamUser = await mostJoeledStreamUserResponse.json();
+
+            if (mostJoeledStreamUser === undefined) {
+                console.error('Error while fetching data');
+                return;
+            }
+
+            // Example data
+            // const data = {
+            //     topStreamers: [
+            //         { name: 'Streamer1', count: 100 },
+            //         { name: 'Streamer2', count: 80 },
+            //         { name: 'Streamer3', count: 60 }
+            //     ],
+            //     topJoelers: [
+            //         { name: 'User1', count: 200 },
+            //         { name: 'User2', count: 150 },
+            //         { name: 'User3', count: 120 }
+            //     ],
+            //     mostJoeledStream: {
+            //         name: 'Stream1',
+            //         date: '2024-01-01',
+            //         count: 300
+            //     },
+            //     personnalRecap: {
+            //         name: 'YourName',
+            //         joelThisYear: 50,
+            //         topStream: {
+            //             name: 'Stream2',
+            //             date: '2024-02-01',
+            //             count: 100
+            //         },
+            //         topStreamer: {
+            //             name: 'Streamer4',
+            //             count: 70
+            //         }
+            //     }
+            // };
+
+            // Populate top streamers
+            document.getElementById('streamerName1').textContent = topStreamers[0].name;
+            document.getElementById('streamerCount1').textContent = topStreamers[0].count;
+            document.getElementById('streamerName2').textContent = topStreamers[1].name;
+            document.getElementById('streamerCount2').textContent = topStreamers[1].count;
+            document.getElementById('streamerName3').textContent = topStreamers[2].name;
+            document.getElementById('streamerCount3').textContent = topStreamers[2].count;
+
+            // Populate top Joelers
+            document.getElementById('userName1').textContent = topJoelers[0].name;
+            document.getElementById('userCount1').textContent = topJoelers[0].count;
+            document.getElementById('userName2').textContent = topJoelers[1].name;
+            document.getElementById('userCount2').textContent = topJoelers[1].count;
+            document.getElementById('userName3').textContent = topJoelers[2].name;
+            document.getElementById('userCount3').textContent = topJoelers[2].count;
+
+            // Populate most Joeled stream
+            document.getElementById('topName').textContent = mostJoeledStream[0].name;
+            document.getElementById('topDate').textContent = mostJoeledStream[0].date;
+            document.getElementById('topCount').textContent = mostJoeledStream[0].count;
+            document.getElementById('topPfp').src = mostJoeledStreamUser.pfp;
+
+            // Populate personal recap
+            
+        });
+
+        async function searchForUser(){
+            const search = document.getElementById('search').value;
+            const dataResponse = await getPersonalRecap(search.trim());
+            const data = await dataResponse.json();
+            
+            if (data === undefined) {
+                console.error('Error while fetching data');
+                return;
+            }
+
+            document.getElementById('personnalName').textContent = data.name;
+            document.getElementById('personnalJoelThisYear').textContent = `Joels this year: ${data.joelThisYear}`;
+            document.getElementById('personnalTopStreamName').textContent = data.topStream.name;
+            document.getElementById('personnalTopStreamDate').textContent = data.topStream.date;
+            document.getElementById('personnalTopStreamCount').textContent = data.topStream.count;
+            document.getElementById('personnalTopStreamerName').textContent = data.topStreamer.name;
+            document.getElementById('personnalTopStreamerCount').textContent = data.topStreamer.count;
+            document.getElementById('personnalRecap').style.display = 'block';
+        }
+
+        async function getTopChannels(){
+            return fetch(
+                "https://venorrak.dev/api/joels/channels?sort=count&way=DESC",
+                { method: 'GET' }
+            );
+        }
+
+        async function getTopUsers(){
+            return fetch(
+                "https://venorrak.dev/api/joels/users?sort=count&way=DESC",
+                { method: 'GET' }
+            );
+        }
+
+        async function getTopStream(){
+            return fetch(
+                "https://venorrak.dev/api/joels/streams?sort=count&way=DESC&limit=1",
+                { method: 'GET' }
+            );
+        }
+
+        async function getTopStreamUser(name) {
+            return fetch(
+                "https://venorrak.dev/api/joels/users/" + name,
+                { method: 'GET' }
+            );
+        }
+
+        async function getPersonalRecap(name){
+            return fetch(
+                "https://venorrak.dev/api/joels/stats/" + name,
+                { method: 'GET' }
+            );
+        }
+    </script>
+</body>
+
+</html>
