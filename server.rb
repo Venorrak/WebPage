@@ -73,14 +73,14 @@ def sendNotif(message, title)
 end
 
 def getUserRarity(name, client)
-    nbOfUsersUnder = client.query("SELECT COUNT(*) AS 'nbOfUsersUnder' FROM joels WHERE count <= (SELECT count FROM joels WHERE user_id = (SELECT id FROM users WHERE name = '#{name}'))").first
+    nbOfUsersUnder = client.query("SELECT COUNT(*) AS 'nbOfUsersUnder' FROM joels WHERE count <= (SELECT count FROM joels WHERE user_id = (SELECT id FROM users WHERE name = '#{name}') LIMIT 1);").first
     nbOfUsersUnder = nbOfUsersUnder["nbOfUsersUnder"]
     nbOfUsers = client.query("SELECT COUNT(*) AS 'nbOfUsers' FROM joels").first["nbOfUsers"]
     return (100 - ((nbOfUsersUnder.to_f / nbOfUsers.to_f) * 100)).round(4)
 end
 
 def getChannelRarity(name, client)
-    nbOfChannelsUnder = client.query("SELECT COUNT(*) AS 'nbOfChannelsUnder' FROM channelJoels WHERE count <= (SELECT count FROM channelJoels WHERE channel_id = (SELECT id FROM channels WHERE name = '#{name}'))").first
+    nbOfChannelsUnder = client.query("SELECT COUNT(*) AS 'nbOfChannelsUnder' FROM channelJoels WHERE count <= (SELECT count FROM channelJoels WHERE channel_id = (SELECT id FROM channels WHERE name = '#{name}') LIMIT 1);").first
     nbOfChannelsUnder = nbOfChannelsUnder["nbOfChannelsUnder"]
     nbOfChannels = client.query("SELECT COUNT(*) AS 'nbOfChannels' FROM channelJoels").first["nbOfChannels"]
     return (100 - ((nbOfChannelsUnder.to_f / nbOfChannels.to_f) * 100)).round(4)
@@ -292,7 +292,8 @@ get '/api/joels/users/:name' do
                 data.to_json
             ]
         end
-    rescue
+    rescue => e
+        p e
         rebootSQLconnection()
         return [
             500,
