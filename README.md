@@ -246,3 +246,64 @@ https://server.venorrak.dev/api/joels/JCP/long
 https://server.venorrak.dev/api/joels/JCP/long?limit=10
 https://server.venorrak.dev/api/joels/JCP/long?since=2020-11-09 20:40:59
 ```
+
+<hr>
+
+### Get Streams
+Get the stats for each stream tracked by Joel Bot
+
+URL : https://server.venorrak.dev/api/joels/streams
+
+#### Input (query)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| limit | int | no | positive int
+| sort | string | no | "ASC", "DESC"
+| way | string | no | "count", "Date"
+
+##### Output
+Array of :
+| Field | type | description
+|-------|------|---------------------
+| name | string | name of the channel
+| count | int | number of Joel said
+| streamDate | Date | date of the stream
+
+#### example
+```
+https://server.venorrak.dev/api/joels/streams
+https://server.venorrak.dev/api/joels/streams?limit=5&sort=ASC&way=count
+```
+
+<hr>
+
+### Get stats on a person
+Get the Joel stats for a person
+
+URL : https://server.venorrak.dev/api/joels/stats/:name
+
+#### Input (url)
+| Paramerter | Type | Required | Possible inputs
+|----|------|-----------|---------------
+| name | String | Yes | name of a registered User
+
+#### Output
+```
+{
+    name: string,
+    joelThisYear: int,
+    topStream: {
+        name: string,
+        count: int,
+        date: date
+    },
+    topStreamer: {
+        name: string,
+        count: int
+    }
+}
+```
+#### example
+```
+https://server.venorrak.dev/api/joels/stats/venorrak
+```
