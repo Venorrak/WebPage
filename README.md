@@ -275,8 +275,8 @@ URL : https://server.venorrak.dev/api/joels/streams
 | Paramerter | Type | Required | Possible inputs
 |----|------|-----------|---------------
 | limit | int | no | positive int
-| sort | string | no | "ASC", "DESC"
-| way | string | no | "count", "Date"
+| way | string | no | "ASC", "DESC"
+| sort | string | no | "count", "Date"
 
 ##### Output
 Array of :
@@ -289,7 +289,7 @@ Array of :
 #### example
 ```
 https://server.venorrak.dev/api/joels/streams
-https://server.venorrak.dev/api/joels/streams?limit=5&sort=ASC&way=count
+https://server.venorrak.dev/api/joels/streams?limit=5&way=ASC&sort=count
 ```
 
 <hr>
