@@ -1,6 +1,23 @@
 # Personnal Website
 #### Website made in ruby with sinatra
 
+## Index
+
+- [Gems needed](#gems-needed-)
+- [Description](#description)
+- [Other](#other)
+- [API](#api)
+    - [Get Users](#get-users--)
+    - [Get Channels](#get-channels-)
+    - [Get User Data](#get-user-info-)
+    - [Get Channel Data](#get-channel-info-)
+    - [Get Channel History](#get-channel-history-)
+    - [Get User History](#get-user-history-)
+    - [Get JCP short term history](#get-jcp-short-term-history)
+    - [Get JCP long term history](#get-jcp-long-term-history)
+    - [Get Streams](#get-streams)
+    - [Get User Stats](#get-stats-on-a-person)
+
 ## Gems needed :
 - sinatra-contrib
 - rackup
