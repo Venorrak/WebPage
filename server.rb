@@ -35,7 +35,7 @@ before do
 end
 set :protection, :except => :frame_options
 set :protection, :except => [:json_csrf]
-set :allow_origin, :any
+set :allow_origin, :DENY
 set :allow_methods, [:get, :post, :options]
 set :allow_credentials, true
 set :max_age, "1728000"
@@ -153,6 +153,17 @@ end
 
 get '/recap' do
     return send_file "html/recap.html"
+end
+
+get '/encoding' do
+    return send_file "html/encoding.html"
+end
+
+get '/jdb/:filename' do
+    filename = params[:filename]
+    response.headers['X-Frame-Options'] = 'ALLOWALL'
+    p filename
+    return send_file "JoelDashBoard/#{filename}"
 end
 
 #-----------------------------------------------------------------------#
